@@ -16,6 +16,7 @@ class Widget(QMainWindow):
         self.ui.delete_btn.clicked.connect(self.delete_note)
         self.ui.add_teg_btn.clicked.connect(self.add_tag)
         self.ui.unpin_teg_btn.clicked.connect(self.del_tag)
+        self.ui.search_teg_btn.clicked.connect(self.search_by_tag)
 
     def show_note(self):
         self.name = self.ui.noet_list.selectedItems()[0].text()
@@ -27,11 +28,12 @@ class Widget(QMainWindow):
         
     def save_note(self):
         tags = []
-        for i in range(self.ui.tag_list.count()):
-            tags.append(self.ui.tag_list.item(i).text())
+        for i in range(self.ui.noet_lnst.count()):
+            tags.append(self.ui.noet_lnst.item(i).text())
+
         self.notes[self.ui.title_edit.text()] = {
             "текст": self.ui.text_edit.toPlainText(),
-            "теги":[]
+            "теги": tags
         }
         with open("notes.json", "w", encoding="utf-8") as file:
             json.dump(self.notes, file)
@@ -82,6 +84,20 @@ class Widget(QMainWindow):
                     self.notes[self.name]["теги"].remove(tag_name)
                     self.ui.noet_lnst.clear()
                     self.ui.noet_lnst.addItems(self.notes[self.name]["теги"])
+
+    def search_by_tag(self):
+
+        tag = self.ui.search_l.text()
+        if tag:
+            matching_notes = []
+            for note_name in self.notes:
+                if tag in self.notes[note_name]["теги"]:
+                    matching_notes.append(note_name)
+
+            self.ui.noet_list.clear()
+            self.ui.noet_list.addItems(matching_notes)
+
+
 app = QApplication([])
 ex = Widget()
 ex.show()
